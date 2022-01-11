@@ -1,0 +1,228 @@
+// this file is parsed by reading the first space-delimited string of each line
+// preceding spaces are ignored
+// // is a valid comment
+// an empty line is ignored
+
+// Commands:
+//   header/endheader:
+//     every line coming after header and before endheader will be inserted into the
+//     source file at the beginning. any macros should be defined here
+//   func <funcName>:
+//     specifies the name of the function for which following metadata is specified
+//   bsize <arg> <expression>:
+//     specifies the size in bytes of an argument that is a blob of data
+//     arg is the name of the argument as defined in the header
+//     expression is a C++ expression that determines the length of the data
+//     other arguments of the function can and should be used in this expression
+//     /string/ is a special case, which assumes arg is a null-terminated string
+//   rsize <arg> <expression>:
+//     specifies that the given argument is a pointer that will be written to
+//     expression is a C++ expression that determines the size of data that is allocated
+//     and can be validly written to
+//     other arguments of the function can and should be used in this expression
+//   custom:
+//     specifies that this function should not be generated, and has custom code defined
+//     in the accompanying code file
+
+header
+
+#include "gl32.h"
+
+endheader
+
+func glBindAttribLocation
+    bsize name /string/
+
+func glBufferData
+    bsize data size
+
+func glBufferSubData
+    bsize data size
+
+func glCompressedTexImage2D
+    bsize data imageSize
+
+func glCompressedTexSubImage2D
+    bsize data imageSize
+
+func glDeleteBuffers
+    bsize buffers n * sizeof(GLuint)
+
+func glDeleteFramebuffers
+    bsize framebuffers n * sizeof(GLuint)
+
+func glDeleteRenderbuffers
+    bsize renderbuffers n * sizeof(GLuint)
+
+func glDeleteTextures
+    bsize textures n * sizeof(GLuint)
+
+func glDrawElements
+    custom
+    // indices might be a blob or an offset to a buffer in gpu memory
+
+func glGenBuffers
+    rsize buffers n * sizeof(GLuint)
+
+func glGenFramebuffers
+    rsize framebuffers n * sizeof(GLuint)
+
+func glGenRenderbuffers
+    rsize renderbuffers n * sizeof(GLuint)
+
+func glGenTextures
+    rsize textures n * sizeof(GLuint)
+
+func glGetActiveAttrib
+    rsize length sizeof(GLsizei)
+    rsize size sizeof(GLsizei)
+    rsize type sizeof(GLenum)
+    rsize name bufSize
+
+func glGetActiveUniform
+    rsize length sizeof(GLsizei)
+    rsize size sizeof(GLsizei)
+    rsize type sizeof(GLenum)
+    rsize name bufSize
+
+func glGetAttachedShaders
+    rsize count sizeof(GLsizei)
+    rsize shaders maxCount * sizeof(GLuint)
+
+func glGetAttribLocation
+    bsize name /string/
+
+func glGetBooleanv
+    rsize data sizeof(GLboolean)
+
+func glGetBufferParameteriv
+    rsize params sizeof(GLint)
+
+func glGetFloatv
+    rsize data sizeof(GLfloat)
+
+func glGetFramebufferAttachmentParameteriv
+    rsize params sizeof(GLint)
+
+func glGetIntegerv
+    rsize data sizeof(GLint)
+
+func glGetProgramiv
+    rsize params (program == GL_COMPUTE_WORK_GROUP_SIZE ? 3 : 1) * sizeof(GLint)
+
+func glGetProgramInfoLog
+    rsize length sizeof(GLsizei)
+    rsize infoLog bufSize
+
+func glGetRenderBufferParameteriv
+    rsize params (pname == GL_RENDERBUFFER_RED_SIZE || pname == GL_RENDERBUFFER_GREEN_SIZE || pname == GL_RENDERBUFFER_BLUE_SIZE || pname == GL_RENDERBUFFER_ALPHA_SIZE || pname == GL_RENDERBUFFER_DEPTH_SIZE || pname == GL_RENDERBUFFER_STENCIL_SIZE ? 2 : 1) * sizeof(GLint)
+
+func glGetShaderiv
+    rsize params sizeof(GLint)
+
+func glGetShaderInfoLog
+    rsize length sizeof(GLsizei)
+    rsize infoLog bufSize
+
+func glGetShaderPrecisionFormat
+    rsize range 2 * sizeof(GLint)
+    rsize precision sizeof(GLint)
+
+func glGetShaderSource
+    rsize length sizeof(GLsizei)
+    rsize source bufSize
+
+func glGetString
+    custom
+    // returns a variable-length null-terminated string
+    // needs to be permanently allocated in the heap somehow
+    // should probably use a heap allocated vector to store all of these
+
+func glGetTexParameterfv
+    rsize params (target == GL_TEXTURE_BORDER_COLOR ? 4 : 1) * sizeof(GLfloat)
+
+func glGetTexParameteriv
+    rsize params (target == GL_TEXTURE_BORDER_COLOR ? 4 : 1) * sizeof(GLint)
+
+func glGetUniformfv
+    custom
+    // TODO: I have no idea how the heck I'm going to do this
+
+func glGetUniformiv
+    custom
+    // TODO: I have no idea how the heck I'm going to do this
+
+func glGetUniformLocation
+    bsize name /string/
+
+func glGetVertexAttribfv
+    rsize params (pname == GL_CURRENT_VERTEX_ATTRIB ? 4 : 1) * sizeof(GLfloat)
+
+func glGetVertexAttribiv
+    rsize params (pname == GL_CURRENT_VERTEX_ATTRIB ? 4 : 1) * sizeof(GLint)
+
+func glGetVertexAttribPointerv
+    custom
+    // no idea, check documentation
+
+func glReadPixels
+    custom
+    // https://www.khronos.org/registry/OpenGL-Refpages/es3.0/html/glReadPixels.xhtml
+    // pixels might be a return pointer or an offset casted to a pointer
+
+func glShaderBinary
+    bsize shaders count * sizeof(GLuint)
+    bsize binary length
+
+func glShaderSource
+    custom
+    // sends an array of null-terminated strings
+
+func glTexImage2D
+    custom
+    // pixels might be a return pointer or an offset casted to a pointer
+
+func glTexParameterfv
+    bsize params (target == GL_TEXTURE_BORDER_COLOR ? 4 : 1) * sizeof(GLfloat)
+
+func glTexParameteriv
+    bsize params (target == GL_TEXTURE_BORDER_COLOR ? 4 : 1) * sizeof(GLint)
+
+func glTexSubImage2D
+    custom
+    // pixels might be a return pointer or an offset casted to a pointer
+
+func glUniform1fv
+    bsize value count * sizeof(GLfloat)
+
+func glUniform1iv
+    bsize value count * sizeof(GLint)
+
+func glUniform2fv
+    bsize value 2 * count * sizeof(GLfloat)
+
+func glUniform2iv
+    bsize value 2 * count * sizeof(GLint)
+
+func glUniform3fv
+    bsize value 3 * count * sizeof(GLfloat)
+
+func glUniform3iv
+    bsize value 3 * count * sizeof(GLint)
+
+func glUniform4fv
+    bsize value 4 * count * sizeof(GLfloat)
+
+func glUniform4iv
+    bsize value 4 * count * sizeof(GLint)
+
+
+
+func glTransformFeedbackVaryings
+    custom
+
+func glGetUniformIndices
+    custom
+
+func glCreateShaderProgramv
+    custom

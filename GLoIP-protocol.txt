@@ -1,0 +1,71 @@
+https://github.com/google/angle/blob/251ba5cb119ff2fed0e861cbc9b096c45004c1fa/src/libGL/libGL_autogen.cpp
+
+Note: Using Java-like data types
+
+The emulated arm code acts as the client, a process using ANGLE for OpenGLES and EGL is the server
+In guest, the connection must first be initiated before using OpenGL
+
+########## Execute function ########## (Client to Server)
+100,
+byte headerLength (= 6)
+int hash of function name
+boolean sendResponse
+byte numArgs
+arg[numArgs] args
+// args are in function signature order, at most 1 custom argument
+
+arg:
+    int argLength
+    byte enum type:
+        primitive = 0
+        pointer_blob = 1
+        pointer_return = 2
+        custom = 3
+    case primitive:
+        byte sizeOfDataType
+        byte[8] data
+    case pointer_blob:
+        int dataSize
+        byte[dataSize] data
+    case pointer_return:
+        int dataSize
+    case custom:
+        int dataSize
+        byte[dataSize]
+
+########## Return function ########## (Server to Client)
+101,
+4-byte hash of function name
+byte numArgs
+arg[numArgs] args
+// args are in function signature order, at most 1 custom argument
+
+arg:
+    int argLength
+    byte enum type:
+        function_return = 0
+        pointer_return = 2
+        custom = 3
+    case function_return:
+        byte sizeOfDataType
+        byte[8] data
+    case pointer_return:
+        int size
+        byte[size] data
+    case custom:
+        int dataSize
+        byte[dataSize] data
+
+########## Initial Handshake ########## (Initiated by client)
+Client to Server:
+    1, 8, 6, 7 (bytes)
+
+Server to Client:
+    5, 3, 0, 9 (bytes)
+
+######### Shutdown Connection ########## (Only sent by client)
+Client to Server
+    83, 84, 79, 80 (bytes)
+
+Server to Client
+    79, 75, 33, 33 (bytes)

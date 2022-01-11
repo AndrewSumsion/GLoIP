@@ -1,0 +1,8 @@
+__pycache__
+.vscode
+out
+client/build
+server/build
+client/gloip_client_generated.cpp
+server/gloip_server_generated.cpp
+protocols/*/*.so

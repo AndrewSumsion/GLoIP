@@ -1,0 +1,20 @@
+header
+
+#include "test.h"
+
+endheader
+
+func printString
+    bsize string /string/
+
+func getString
+    rsize string /string/
+
+func printHex
+    bsize buffer count
+
+func getHash
+    bsize buffer count
+
+func customFunction
+    custom
