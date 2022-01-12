@@ -169,7 +169,7 @@ bool gloip_handleNextCommand(TcpSocket* io) {
         return true;
     }
 
-    uint8_t responseHeader[6];
+    uint8_t responseHeader[6]{0};
     responseHeader[0] = 101;
     memcpy(responseHeader + 1, &functionHash, 1);
 
@@ -180,7 +180,7 @@ bool gloip_handleNextCommand(TcpSocket* io) {
         numReturnArgs++;
     
     for(int i = 0; i < numArgs; i++) {
-        if(args[0]->getType() == TYPE_POINTER_RETURN || args[0]->getType() == TYPE_CUSTOM) {
+        if(args[i]->getType() == TYPE_POINTER_RETURN || args[i]->getType() == TYPE_CUSTOM) {
             numReturnArgs++;
         }
     }
@@ -211,7 +211,10 @@ bool gloip_handleNextCommand(TcpSocket* io) {
 
         uint32_t returnBufferLength = 9 + argSize;
         uint8_t* returnBuffer = new uint8_t[returnBufferLength];
-        memcpy(returnBuffer, &returnBufferLength, sizeof(uint32_t));
+
+        uint32_t sizeWithoutHeader = returnBufferLength - 4;
+        memcpy(returnBuffer, &sizeWithoutHeader, sizeof(uint32_t));
+
         returnBuffer[4] = arg->getType();
         memcpy(returnBuffer + 5, &argSize, sizeof(uint32_t));
         memcpy(returnBuffer + 9, arg->destination, argSize);

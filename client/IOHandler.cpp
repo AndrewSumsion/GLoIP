@@ -20,6 +20,10 @@ char* formatArray(int size, const uint8_t* buffer) {
 }
 
 bool IOHandler::writeAll(int size, const uint8_t* buffer) {
+    //char* formattedString = formatArray(size, buffer);
+    //printf("Write\t%d%s\n", size, formattedString);
+    //delete [] formattedString;
+
     pthread_mutex_lock(&writeMutex);
 
     int bytesWritten = 0;
@@ -33,9 +37,6 @@ bool IOHandler::writeAll(int size, const uint8_t* buffer) {
     }
     pthread_mutex_unlock(&writeMutex);
 
-    //char* formattedArray = formatArray(size, buffer);
-    //printf("Write\t%d\t%s\n", size, formattedArray);
-    //delete [] formattedArray;
     return true;
 }
 
@@ -52,9 +53,9 @@ bool IOHandler::readAll(int size, uint8_t* buffer) {
     }
     pthread_mutex_unlock(&readMutex);
 
-    //char* formattedArray = formatArray(size, buffer);
-    //printf("Read\t%d\t%s\n", size, formattedArray);
-    //delete [] formattedArray;
+    //char* formattedString = formatArray(size, buffer);
+    //printf("Read\t%d%s\n", size, formattedString);
+    //delete [] formattedString;
     return true;
 }
 

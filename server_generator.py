@@ -91,7 +91,7 @@ def parseHeaderFile(file):
 
         args = []
 
-        if argsString != "void":
+        if argsString != "void" and argsString != "":
             for s in argsString.split(","):
                 kv = s.strip().split(" ")
                 if kv[-1].startswith("*"):
