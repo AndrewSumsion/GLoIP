@@ -84,17 +84,17 @@ bool TcpSocket::readAll(int size, uint8_t* buffer) {
         totalBytesRead += bytesRead;
     }
 
-    char* formattedString = formatArray(size, buffer);
-    printf("Read\t%d%s\n", size, formattedString);
-    delete [] formattedString;
+    //char* formattedString = formatArray(size, buffer);
+    //printf("Read\t%d%s\n", size, formattedString);
+    //delete [] formattedString;
 
     return true;
 }
 
 bool TcpSocket::writeAll(int size, const uint8_t* buffer) {
-    char* formattedString = formatArray(size, buffer);
-    printf("Write\t%d%s\n", size, formattedString);
-    delete [] formattedString;
+    //char* formattedString = formatArray(size, buffer);
+    //printf("Write\t%d%s\n", size, formattedString);
+    //delete [] formattedString;
 
     int totalBytesWritten = 0;
     int bytesWritten = 0;
