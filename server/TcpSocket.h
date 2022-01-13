@@ -6,12 +6,15 @@
 #include <cstdint>
 using std::uint8_t;
 
+#define IO(expr) if(!(expr)) return false
+
 namespace tcplib {
 
 class TcpSocket {
 private:
     SOCKET socketHandle;
     int error;
+    bool closed;
 
 public:
     TcpSocket(SOCKET socketHandle);
@@ -27,6 +30,7 @@ public:
 
     bool close();
 
+    bool isClosed() const;
     int getError() const;
 };
 

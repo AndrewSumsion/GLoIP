@@ -86,7 +86,7 @@ inline GloipFunction gloip_getGloipFunction(uint32_t hash) {
     return gloip_getGloipFunctionArray()[hash];
 }
 
-GLOIP_EXPORT void gloip_startServer(const char* hostname, int port);
+GLOIP_EXPORT bool gloip_startServer(const char* hostname, int port);
 
 void gloip_mainLoop(TcpSocket connection);
 

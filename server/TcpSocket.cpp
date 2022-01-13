@@ -31,7 +31,8 @@ TcpSocket::TcpSocket()
 
 TcpSocket::TcpSocket(SOCKET socketHandle)
     : socketHandle(socketHandle),
-      error(0) {
+      error(0),
+      closed(false) {
 
 }
 
@@ -118,6 +119,10 @@ bool TcpSocket::close() {
     }
 
     return true;
+}
+
+bool TcpSocket::isClosed() const {
+    return closed;
 }
 
 int TcpSocket::getError() const {

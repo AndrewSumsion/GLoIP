@@ -7,6 +7,9 @@
 using std::uint8_t;
 using std::uint16_t;
 
+#define IO(expr) if(!(expr)) return false;
+#define IOHANDLER(expr, handler) do { if(!(expr)) { handler; return false; } } while(0)
+
 class IOHandler {
 private:
     const static bool isBigEndian = false;

@@ -5,6 +5,8 @@
 #include <thread>
 using std::thread;
 
+#include <cstdio>
+
 PrimitiveArgument::PrimitiveArgument(uint8_t typeSize, const void* primitive)
     : typeSize(typeSize)
     {
@@ -74,20 +76,28 @@ uint32_t CustomArgument::getSize() {
     return 1 + sizeof(uint32_t) + size;
 }
 
-void gloip_startServer(const char* hostname, int port) {
+bool gloip_startServer(const char* hostname, int port) {
+    bool success;
+
     TcpServer server = TcpServer();
-    server.startServer(hostname, port);
+    IO(server.startServer(hostname, port));
+    
 
     // TODO: add an exit condition
     while(true) {
         TcpSocket socket;
-        server.accept(&socket);
+        IO(server.accept(&socket));
 
         uint8_t handshakeBuffer[4];
         
-        socket.readAll(4, handshakeBuffer);
+        success = socket.readAll(4, handshakeBuffer);
+        if(!success) {
+            socket.close();
+            return false;
+        }
+
         if(handshakeBuffer[0] != 1 || handshakeBuffer[1] != 8 || handshakeBuffer[2] != 6 || handshakeBuffer[3] != 7) {
-            // invalid connection
+            // incorrect protocol
             socket.close();
             continue;
         }
@@ -97,11 +107,17 @@ void gloip_startServer(const char* hostname, int port) {
         handshakeBuffer[2] = 0;
         handshakeBuffer[3] = 9;
 
-        socket.writeAll(4, handshakeBuffer);
+        success = socket.writeAll(4, handshakeBuffer);
+        if(!success) {
+            socket.close();
+            return false;
+        }
 
         thread t = thread(gloip_mainLoop, socket);
         t.detach();
     }
+
+    return true;
 }
 
 void gloip_mainLoop(TcpSocket connection) {
@@ -110,14 +126,17 @@ void gloip_mainLoop(TcpSocket connection) {
 }
 
 bool gloip_handleNextCommand(TcpSocket* io) {
+    bool success;
+
     uint8_t packetId;
-    io->readAll(1, &packetId);
+
+    IO(io->readAll(1, &packetId));
 
     // handle shutdown
     if(packetId == 83) {
         uint8_t shutdownBuffer[4];
         shutdownBuffer[0] = packetId;
-        io->readAll(3, shutdownBuffer + 1);
+        IO(io->readAll(3, shutdownBuffer + 1));
         if(shutdownBuffer[0] != 83 || shutdownBuffer[1] != 84 || shutdownBuffer[2] != 79 || shutdownBuffer[3] != 80) {
             // something's really wrong, shut down anyway
             return false;
@@ -128,7 +147,7 @@ bool gloip_handleNextCommand(TcpSocket* io) {
         shutdownBuffer[2] = 33;
         shutdownBuffer[3] = 33;
 
-        io->writeAll(4, shutdownBuffer);
+        IO(io->writeAll(4, shutdownBuffer));
         return false;
     }
 
@@ -139,10 +158,10 @@ bool gloip_handleNextCommand(TcpSocket* io) {
 
     // read function execution request
     uint8_t headerLength;
-    io->readAll(1, &headerLength);
+    IO(io->readAll(1, &headerLength));
 
     uint8_t* headerBuffer = new uint8_t[headerLength];
-    io->readAll(headerLength, headerBuffer);
+    IO(io->readAll(headerLength, headerBuffer));
     uint32_t functionHash; // = *((uint32_t*)headerBuffer);
     memcpy(&functionHash, headerBuffer, sizeof(uint32_t));
     bool sendResponse = (bool) headerBuffer[4];
@@ -154,6 +173,8 @@ bool gloip_handleNextCommand(TcpSocket* io) {
 
     for(int i = 0; i < numArgs; i++) {
         args[i] = gloip_readArgument(io);
+        if(args[i] == nullptr)
+            return false;
     }
 
     // execute function and get info about return type
@@ -187,7 +208,7 @@ bool gloip_handleNextCommand(TcpSocket* io) {
 
     responseHeader[5] = numReturnArgs;
 
-    io->writeAll(6, responseHeader);
+    IO(io->writeAll(6, responseHeader));
 
     if(nonVoidReturnType) {
         uint32_t returnBufferLength = 14;
@@ -199,7 +220,7 @@ bool gloip_handleNextCommand(TcpSocket* io) {
         returnBuffer[5] = returnSize;
         memcpy(returnBuffer + 6, returnValue, 8);
 
-        io->writeAll(returnBufferLength, returnBuffer);
+        IO(io->writeAll(returnBufferLength, returnBuffer));
     }
 
     for(int i = 0; i < numArgs; i++) {
@@ -219,7 +240,7 @@ bool gloip_handleNextCommand(TcpSocket* io) {
         memcpy(returnBuffer + 5, &argSize, sizeof(uint32_t));
         memcpy(returnBuffer + 9, arg->destination, argSize);
 
-        io->writeAll(returnBufferLength, returnBuffer);
+        IO(io->writeAll(returnBufferLength, returnBuffer));
 
         delete [] returnBuffer;
     }
@@ -240,7 +261,7 @@ bool gloip_handleNextCommand(TcpSocket* io) {
         memcpy(returnBuffer + 5, &argSize, sizeof(uint32_t));
         memcpy(returnBuffer + 9, arg->data, argSize);
 
-        io->writeAll(returnBufferLength, returnBuffer);
+        IO(io->writeAll(returnBufferLength, returnBuffer));
 
         delete [] returnBuffer;
     }
@@ -254,10 +275,20 @@ bool gloip_handleNextCommand(TcpSocket* io) {
 }
 
 Argument* gloip_readArgument(TcpSocket* io) {
+    bool success;
+
     uint32_t argumentLength;
-    io->readAll(4, (uint8_t*)&argumentLength);
+    success = io->readAll(4, (uint8_t*)&argumentLength);
+    if(!success) {
+        return nullptr;
+    }
+    
     uint8_t* argumentBuffer = new uint8_t[argumentLength];
-    io->readAll(argumentLength, argumentBuffer);
+    success = io->readAll(argumentLength, argumentBuffer);
+    if(!success) {
+        return nullptr;
+    }
+    
     ArgumentType argType = (ArgumentType)argumentBuffer[0];
 
     Argument* result = nullptr;
@@ -287,7 +318,7 @@ PrimitiveArgument* gloip_createPrimitiveArgument(uint32_t size, const uint8_t* b
 }
 
 BlobArgument* gloip_createBlobArgument(uint32_t size, const uint8_t* buffer) {
-    uint32_t dataSize; // = *((uint32_t*)(buffer + 1));
+    uint32_t dataSize;
     memcpy(&dataSize, buffer + 1, sizeof(uint32_t));
     uint8_t* blobData = new uint8_t[dataSize];
     memcpy(blobData, buffer + 5, dataSize);
@@ -295,14 +326,14 @@ BlobArgument* gloip_createBlobArgument(uint32_t size, const uint8_t* buffer) {
 }
 
 BlobReturnArgument* gloip_createBlobReturnArgument(uint32_t size, const uint8_t* buffer) {
-    uint32_t dataSize; // = *((uint32_t*)(buffer + 1));
+    uint32_t dataSize;
     memcpy(&dataSize, buffer + 1, sizeof(uint32_t));
     uint8_t* blobData = new uint8_t[dataSize];
     return new BlobReturnArgument(dataSize, blobData);
 }
 
 CustomArgument* gloip_createCustomArgument(uint32_t size, const uint8_t* buffer) {
-    uint32_t dataSize; // = *((uint32_t*)(buffer + 1));
+    uint32_t dataSize;
     memcpy(&dataSize, buffer + 1, sizeof(uint32_t));
     CustomArgument* arg = new CustomArgument(dataSize);
     memcpy(arg->data, buffer + 5, dataSize);
