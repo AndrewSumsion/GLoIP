@@ -131,7 +131,8 @@ def writeFunction(file, name, function, meta):
         metaArgs = meta["functions"][name]
     
     if metaArgs != None and "custom" in metaArgs and metaArgs["custom"]:
-        # don't generate code for a custom function
+        # don't generate code for a custom function, just provide its hash for the implementation
+        file.write("#define HASH_" + name + " (" + hashExpression + ")\n")
         return
 
     declarationString = "GL_APICALL " + retType + " GL_APIENTRY " + name + "(" + argsString + ") {\n"
@@ -213,11 +214,11 @@ def generateClient(headerPath, metaPath, customPath, sourcePath):
 
     writeHeader(sourceFile, meta)
 
+    for function in functions:
+        writeFunction(sourceFile, function, functions[function], meta)
+    
     with open(customPath, "r") as custom:
         sourceFile.writelines(custom.readlines())
         sourceFile.write("\n")
-
-    for function in functions:
-        writeFunction(sourceFile, function, functions[function], meta)
 
     sourceFile.close()

@@ -41,3 +41,6 @@ func printIntegers
 
 func getHash
     bsize buffer count
+
+func getProperty
+    custom

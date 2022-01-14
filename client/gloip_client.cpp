@@ -106,6 +106,12 @@ uint32_t CustomArgument::getSize() {
     return 1 + sizeof(uint32_t) + size;
 }
 
+void CustomArgument::reallocate(uint32_t newSize) {
+    delete [] data;
+    size = newSize;
+    data = new uint8_t[size];
+}
+
 void gloip_cleanupHandler(void* arg) {
     printf("cleaning up connection on thread exit\n");
 
@@ -248,9 +254,11 @@ void gloip_waitForResponse(IOHandler* io, size_t returnSize, void* returnLocatio
             }
             // if custom argument is present, copy any data
             if(customArg != nullptr) {
-                // copy the minimum of how much data was provided and how much data our CustomArgument can hold
-                uint32_t dataToCopy = customArg->size < providedSize ? customArg->size : providedSize;
-                memcpy(customArg->data, argBuffer + 4, dataToCopy);
+                // if the server sends back more data than we sent, reallocate enough room for the data
+                if(providedSize > customArg->size) {
+                    customArg->reallocate(providedSize);
+                }
+                memcpy(customArg->data, argBuffer + 4, providedSize);
             }
         }
 

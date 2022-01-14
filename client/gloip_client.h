@@ -64,6 +64,8 @@ struct BlobReturnArgument : public Argument {
 
 struct CustomArgument : public Argument {
     uint32_t size;
+
+    // IMPORTANT: This pointer should not be stored outside this class, as it may be changed
     uint8_t* data;
 
     CustomArgument(uint32_t size);
@@ -72,6 +74,7 @@ struct CustomArgument : public Argument {
     ArgumentType getType();
     void writeToBuffer(uint8_t* buffer);
     uint32_t getSize();
+    void reallocate(uint32_t newSize);
 };
 
 GLOIP_EXPORT void gloip_initialize(const char* hostname, int port);

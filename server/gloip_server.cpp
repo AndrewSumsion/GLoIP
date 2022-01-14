@@ -76,6 +76,12 @@ uint32_t CustomArgument::getSize() {
     return 1 + sizeof(uint32_t) + size;
 }
 
+void CustomArgument::reallocate(uint32_t newSize) {
+    delete [] data;
+    size = newSize;
+    data = new uint8_t[size];
+}
+
 bool gloip_startServer(const char* hostname, int port) {
     bool success;
 
@@ -256,7 +262,10 @@ bool gloip_handleNextCommand(TcpSocket* io) {
 
         uint32_t returnBufferLength = 9 + argSize;
         uint8_t* returnBuffer = new uint8_t[returnBufferLength];
-        memcpy(returnBuffer, &returnBufferLength, sizeof(uint32_t));
+
+        uint32_t sizeWithoutHeader = returnBufferLength - 4;
+        memcpy(returnBuffer, &sizeWithoutHeader, sizeof(uint32_t));
+
         returnBuffer[4] = arg->getType();
         memcpy(returnBuffer + 5, &argSize, sizeof(uint32_t));
         memcpy(returnBuffer + 9, arg->data, argSize);
