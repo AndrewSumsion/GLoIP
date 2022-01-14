@@ -8,7 +8,6 @@ using std::uint8_t;
 
 class TcpIOHandler : public IOHandler {
 public:
-    bool isValid;
     int error;
     int fd;
     const char* hostname;

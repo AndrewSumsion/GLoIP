@@ -9,6 +9,8 @@ using std::vector;
 
 #include <cstdio>
 
+#define LOG(...) printf(__VA_ARGS__)
+
 void Argument::writeHeaderToBuffer(uint8_t* buffer) {
     uint32_t size = getSize();
     std::memcpy(buffer, &size, sizeof(uint32_t));
@@ -113,7 +115,8 @@ void CustomArgument::reallocate(uint32_t newSize) {
 }
 
 void gloip_cleanupHandler(void* arg) {
-    printf("cleaning up connection on thread exit\n");
+    LOG("cleaning up connection on thread exit\n");
+    bool success;
 
     IOHandler* io = (IOHandler*) arg;
 
@@ -122,10 +125,19 @@ void gloip_cleanupHandler(void* arg) {
     }
 
     uint8_t shutdownBuffer[4] = {83, 84, 79, 80};
-    io->writeAll(4, shutdownBuffer);
-    io->readAll(4, shutdownBuffer);
+    success = io->writeAll(4, shutdownBuffer);
+    if(!success) {
+        LOG("IO Error sending thread shutdown request! Error: %d\n", io->getError());
+        return;
+    }
+
+    success = io->readAll(4, shutdownBuffer);
+    if(!success) {
+        LOG("IO Error receiving thread shutdown response! Error: %d\n", io->getError());
+        return;
+    }
     if(shutdownBuffer[0] != 79 || shutdownBuffer[1] != 75 || shutdownBuffer[2] != 33 || shutdownBuffer[3] != 33) {
-        // TODO: Do something
+        LOG("Server sent invalid shutdown response!\n");
     }
 
     io->disconnect();
@@ -155,17 +167,43 @@ IOHandler* gloip_getConnection() {
         connection = gloip_createConnection();
         pthread_setspecific(connectionKey, connection);
     }
+    if(connection != nullptr && !connection->isConnected()) {
+        delete connection;
+        connection = gloip_createConnection();
+        pthread_setspecific(connectionKey, connection);
+    }
     return connection;
 }
 
 IOHandler* gloip_createConnection() {
+    bool success;
+
     IOHandler* handler = new TcpIOHandler(gloipHostname, gloipPort);
-    handler->connect();
+    success = handler->connect();
+    if(!success) {
+        LOG("IO Error connecting to server! Error: %d\n", handler->getError());
+        return nullptr;
+    }
+
     uint8_t handshakeBuffer[4] = {1, 8, 6, 7};
-    handler->writeAll(4, handshakeBuffer);
-    handler->readAll(4, handshakeBuffer);
+
+    success = handler->writeAll(4, handshakeBuffer);
+    if(!success) {
+        LOG("IO Error sending handshake to server! Error: %d\n", handler->getError());
+        handler->disconnect();
+        return nullptr;
+    }
+
+    success = handler->readAll(4, handshakeBuffer);
+    if(!success) {
+        LOG("IO Error receiving handshake from server! Error: %d\n", handler->getError());
+        handler->disconnect();
+        return nullptr;
+    }
+
     if(handshakeBuffer[0] != 5 || handshakeBuffer[1] != 3 || handshakeBuffer[2] != 0 || handshakeBuffer[3] != 9) {
-        // TODO: Do some kind of error handling here
+        LOG("Server sent invalid handshake!\n");
+        handler->disconnect();
         return nullptr;
     }
 
@@ -175,49 +213,68 @@ IOHandler* gloip_createConnection() {
 void gloip_execute(uint32_t functionHash, bool waitForReturn, size_t returnSize, void* returnLocation, int numArgs, Argument** args) {
     IOHandler* io = gloip_getConnection();
 
-    gloip_sendRequest(io, functionHash, waitForReturn, numArgs, args);
+    if(io == nullptr) {
+        LOG("Unable to acquire connection to server. Ignoring this function call.\n");
+        memset(returnLocation, 0, returnSize);
+        return;
+    }
+
+    if(!gloip_sendRequest(io, functionHash, waitForReturn, numArgs, args)) {
+        LOG("Error occurred sending request to server. Closing connection...\n");
+        io->disconnect();
+        memset(returnLocation, 0, returnSize);
+        return;
+    }
 
     if(!waitForReturn) {
         // if waitForReturn is false, we shouldn't wait, and the server will not send a response
         return;
     }
 
-    gloip_waitForResponse(io, returnSize, returnLocation, numArgs, args);
-}
-
-void gloip_sendRequest(IOHandler* io, uint32_t functionHash, bool sendResponse, int numArgs, Argument** args) {
-    uint8_t headerPacket[] = {
-        100, 6, 0, 0, 0, 0, sendResponse ? 1 : 0, numArgs
-    };
-    std::memcpy(headerPacket + 2, &functionHash, sizeof(uint32_t));
-    io->writeAll(sizeof(headerPacket), headerPacket);
-
-    for(int i = 0; i < numArgs; i++) {
-        Argument* arg = args[i];
-        gloip_writeArgument(io, arg);
+    if(!gloip_waitForResponse(io, returnSize, returnLocation, numArgs, args)) {
+        LOG("Error occurred waiting for response from server. Closing connection...\n");
+        io->disconnect();
+        memset(returnLocation, 0, returnSize);
     }
 }
 
-void gloip_writeArgument(IOHandler* io, Argument* arg) {
+bool gloip_sendRequest(IOHandler* io, uint32_t functionHash, bool sendResponse, int numArgs, Argument** args) {
+    uint8_t headerPacket[] = {
+        100, 6, 0, 0, 0, 0, sendResponse ? (uint8_t)1 : (uint8_t)0, (uint8_t)numArgs
+    };
+    std::memcpy(headerPacket + 2, &functionHash, sizeof(uint32_t));
+    IO(io->writeAll(sizeof(headerPacket), headerPacket));
+
+    for(int i = 0; i < numArgs; i++) {
+        Argument* arg = args[i];
+        IO(gloip_writeArgument(io, arg));
+    }
+
+    return true;
+}
+
+bool gloip_writeArgument(IOHandler* io, Argument* arg) {
     uint32_t packetSize = arg->getSize() + 4;
     uint8_t* packet = new uint8_t[packetSize];
     arg->writeToBuffer(packet);
-    io->writeAll(packetSize, packet);
+    IO(io->writeAll(packetSize, packet));
     delete[] packet;
+
+    return true;
 }
 
-void gloip_waitForResponse(IOHandler* io, size_t returnSize, void* returnLocation, int numArgs, Argument** args) {
+bool gloip_waitForResponse(IOHandler* io, size_t returnSize, void* returnLocation, int numArgs, Argument** args) {
     uint8_t returnHeader[6];
-    io->readAll(6, returnHeader);
+    IO(io->readAll(6, returnHeader));
     // TODO: Assert everything is correct in returnHeader
 
     uint8_t numReturnArgs = returnHeader[5];
     int argIndex = 0;
     for(int i = 0; i < numReturnArgs; i++) {
         uint32_t argSize;
-        io->readAll(4, (uint8_t*)&argSize);
+        IO(io->readAll(4, (uint8_t*)&argSize));
         uint8_t* argInBuffer = new uint8_t[argSize];
-        io->readAll(argSize, argInBuffer);
+        IO(io->readAll(argSize, argInBuffer));
         ArgumentType argType = (ArgumentType) argInBuffer[0];
         
         const uint8_t* argBuffer = argInBuffer + 1;
@@ -264,4 +321,6 @@ void gloip_waitForResponse(IOHandler* io, size_t returnSize, void* returnLocatio
 
         delete[] argInBuffer;
     }
+
+    return true;
 }

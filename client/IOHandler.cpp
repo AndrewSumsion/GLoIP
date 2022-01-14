@@ -59,7 +59,12 @@ bool IOHandler::readAll(int size, uint8_t* buffer) {
     return true;
 }
 
-IOHandler::IOHandler() {
+bool IOHandler::isConnected() const {
+    return connected;
+}
+
+IOHandler::IOHandler()
+    : connected(false) {
     pthread_mutex_init(&readMutex, nullptr);
     pthread_mutex_init(&writeMutex, nullptr);
 }

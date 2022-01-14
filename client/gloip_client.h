@@ -84,8 +84,8 @@ IOHandler* gloip_getConnection();
 IOHandler* gloip_createConnection();
 
 void gloip_execute(uint32_t functionHash, bool waitForReturn, size_t returnSize, void* returnLocation, int numArgs, Argument** args);
-void gloip_sendRequest(IOHandler* io, uint32_t functionHash, bool sendResponse, int numArgs, Argument** args);
-void gloip_writeArgument(IOHandler* io, Argument* arg);
-void gloip_waitForResponse(IOHandler* io, size_t returnSize, void* returnLocation, int numArgs, Argument** args);
+bool gloip_sendRequest(IOHandler* io, uint32_t functionHash, bool sendResponse, int numArgs, Argument** args);
+bool gloip_writeArgument(IOHandler* io, Argument* arg);
+bool gloip_waitForResponse(IOHandler* io, size_t returnSize, void* returnLocation, int numArgs, Argument** args);
 
 #endif // GLOIP_CLIENT_H

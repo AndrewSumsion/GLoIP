@@ -25,8 +25,7 @@ TcpIOHandler::TcpIOHandler(const char* hostname, int port)
     : hostname(hostname),
       port(port),
       fd(0),
-      error(0),
-      isValid(false) {
+      error(0) {
 
 }
 
@@ -49,16 +48,18 @@ bool TcpIOHandler::connect() {
     success = connectImpl(fd, (sockaddr*)&server, sizeof(server));
     CHECK_RETURN(success);
 
-    isValid = true;
+    connected = true;
     return true;
 }
 
 bool TcpIOHandler::disconnect() {
-    if(!isValid) {
+    if(!connected) {
         return false;
     }
     int success = close(fd);
     CHECK_RETURN(success);
+
+    connected = false;
     return true;
 }
 
@@ -67,7 +68,7 @@ int TcpIOHandler::getError() {
 }
 
 bool TcpIOHandler::read(int size, uint8_t *buffer, int* bytesRead) {
-    if(!isValid) {
+    if(!connected) {
         return false;
     }
     ssize_t result = readImpl(fd, buffer, size);
@@ -77,7 +78,7 @@ bool TcpIOHandler::read(int size, uint8_t *buffer, int* bytesRead) {
 }
 
 bool TcpIOHandler::write(int size, const uint8_t *buffer, int* bytesWritten) {
-    if(!isValid) {
+    if(!connected) {
         return false;
     }
     ssize_t result = writeImpl(fd, buffer, size);
