@@ -46,7 +46,7 @@ struct PrimitiveArgument : public Argument {
 
 struct BlobArgument : public Argument {
     uint32_t size;
-    const uint8_t* data;
+    uint8_t* data;
 
     BlobArgument(uint32_t size, const uint8_t* data);
     ~BlobArgument();

@@ -23,6 +23,9 @@
 //   custom:
 //     specifies that this function should not be generated, and has custom code defined
 //     in the accompanying code file
+//   blocking:
+//     denotes that this function should always wait for a response from the server,
+//     regardless of whether anything gets returned
 
 header
 

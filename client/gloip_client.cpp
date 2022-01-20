@@ -43,7 +43,9 @@ BlobArgument::BlobArgument(uint32_t size, const void* data)
     : size(size),
       data(data)
     {
-
+    if(data == nullptr) {
+        size = 0;
+    }
 }
 
 ArgumentType BlobArgument::getType() {
@@ -55,7 +57,9 @@ void BlobArgument::writeToBuffer(uint8_t* buffer) {
     buffer += 5;
     std::memcpy(buffer, &size, sizeof(uint32_t));
     buffer += 4;
-    std::memcpy(buffer, data, size);
+    if(size > 0) {
+        std::memcpy(buffer, data, size);
+    }
 }
 
 uint32_t BlobArgument::getSize() {

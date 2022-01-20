@@ -22,10 +22,14 @@ uint32_t PrimitiveArgument::getSize() {
 }
 
 BlobArgument::BlobArgument(uint32_t size, const uint8_t* data)
-    : size(size),
-      data(data)
+    : size(size)
     {
-
+    if(size != 0) {
+        this->data = new uint8_t[size];
+        memcpy(this->data, data, size);
+    } else {
+        this->data = nullptr;
+    }
 }
 
 BlobArgument::~BlobArgument() {
@@ -329,9 +333,8 @@ PrimitiveArgument* gloip_createPrimitiveArgument(uint32_t size, const uint8_t* b
 BlobArgument* gloip_createBlobArgument(uint32_t size, const uint8_t* buffer) {
     uint32_t dataSize;
     memcpy(&dataSize, buffer + 1, sizeof(uint32_t));
-    uint8_t* blobData = new uint8_t[dataSize];
-    memcpy(blobData, buffer + 5, dataSize);
-    return new BlobArgument(dataSize, blobData);
+
+    return new BlobArgument(dataSize, buffer + 5);
 }
 
 BlobReturnArgument* gloip_createBlobReturnArgument(uint32_t size, const uint8_t* buffer) {
