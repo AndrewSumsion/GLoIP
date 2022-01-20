@@ -305,7 +305,7 @@ bool gloip_waitForResponse(IOHandler* io, size_t returnSize, void* returnLocatio
             uint32_t providedSize;
             memcpy(&providedSize, argBuffer, sizeof(uint32_t));
 
-            // find the custom argument in the list of arguments
+            // find the custom argument in the list of arguments (there should only be one)
             CustomArgument* customArg = nullptr;
             for(int i = 0; i < numArgs; i++) {
                 if(args[i]->getType() == TYPE_CUSTOM) {

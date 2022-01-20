@@ -64,6 +64,9 @@ func glDrawElements
     custom
     // indices might be a blob or an offset to a buffer in gpu memory
 
+func glFinish
+    blocking
+
 func glGenBuffers
     rsize buffers n * sizeof(GLuint)
 
