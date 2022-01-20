@@ -28,9 +28,7 @@
 //     regardless of whether anything gets returned
 
 header
-
 #include "gl32.h"
-
 endheader
 
 func glBindAttribLocation
@@ -120,7 +118,7 @@ func glGetProgramInfoLog
     rsize length sizeof(GLsizei)
     rsize infoLog bufSize
 
-func glGetRenderBufferParameteriv
+func glGetRenderbufferParameteriv
     rsize params (pname == GL_RENDERBUFFER_RED_SIZE || pname == GL_RENDERBUFFER_GREEN_SIZE || pname == GL_RENDERBUFFER_BLUE_SIZE || pname == GL_RENDERBUFFER_ALPHA_SIZE || pname == GL_RENDERBUFFER_DEPTH_SIZE || pname == GL_RENDERBUFFER_STENCIL_SIZE ? 2 : 1) * sizeof(GLint)
 
 func glGetShaderiv
@@ -222,13 +220,399 @@ func glUniform4fv
 func glUniform4iv
     bsize value 4 * count * sizeof(GLint)
 
+func glUniformMatrix2fv
+    
 
+func glUniformMatrix3fv
+    
+
+func glUniformMatrix4fv
+    
+
+func glVertexAttrib1fv
+    
+
+func glVertexAttrib2fv
+    
+
+func glVertexAttrib3fv
+    
+
+func glVertexAttrib4fv
+    
+
+func glVertexAttribPointer
+    
+
+func glDrawRangeElements
+    
+
+func glTexImage3D
+    
+
+func glTexSubImage3D
+    
+
+func glCompressedTexImage3D
+    
+
+func glCompressedTexSubImage3D
+    
+
+func glGenQueries
+    
+
+func glDeleteQueries
+    
+
+func glGetQueryiv
+    
+
+func glGetQueryObjectuiv
+    
+
+func glGetBufferPointerv
+    
+
+func glDrawBuffers
+    
+
+func glUniformMatrix2x3fv
+    
+
+func glUniformMatrix3x2fv
+    
+
+func glUniformMatrix2x4fv
+    
+
+func glUniformMatrix4x2fv
+    
+
+func glUniformMatrix3x4fv
+    
+
+func glUniformMatrix4x3fv
+    
+
+func glMapBufferRange
+    
+
+func glDeleteVertexArrays
+    
+
+func glGenVertexArrays
+    
+
+func glGetIntegeri_v
+    
 
 func glTransformFeedbackVaryings
     custom
 
+func glGetTransformFeedbackVarying
+    
+
+func glVertexAttribIPointer
+    
+
+func glGetVertexAttribIiv
+    
+
+func glGetVertexAttribIuiv
+    
+
+func glVertexAttribI4iv
+    
+
+func glVertexAttribI4uiv
+    
+
+func glGetUniformuiv
+    
+
+func glGetFragDataLocation
+    
+
+func glUniform1uiv
+    
+
+func glUniform2uiv
+    
+
+func glUniform3uiv
+    
+
+func glUniform4uiv
+    
+
+func glClearBufferiv
+    
+
+func glClearBufferuiv
+    
+
+func glClearBufferfv
+    
+
+func glGetStringi
+    
+
 func glGetUniformIndices
     custom
 
+func glGetActiveUniformsiv
+    
+
+func glGetUniformBlockIndex
+    
+
+func glGetActiveUniformBlockiv
+    
+
+func glGetActiveUniformBlockName
+    
+
+func glDrawElementsInstanced
+    
+
+func glGetInteger64v
+    
+
+func glGetSynciv
+    
+
+func glGetInteger64i_v
+    
+
+func glGetBufferParameteri64v
+    
+
+func glGenSamplers
+    
+
+func glDeleteSamplers
+    
+
+func glSamplerParameteriv
+    
+
+func glSamplerParameterfv
+    
+
+func glGetSamplerParameteriv
+    
+
+func glGetSamplerParameterfv
+    
+
+func glDeleteTransformFeedbacks
+    
+
+func glGenTransformFeedbacks
+    
+
+func glGetProgramBinary
+    
+
+func glProgramBinary
+    
+
+func glInvalidateFramebuffer
+    
+
+func glInvalidateSubFramebuffer
+    
+
+func glGetInternalformativ
+    
+
+func glDrawArraysIndirect
+    
+
+func glDrawElementsIndirect
+    
+
+func glGetFramebufferParameteriv
+    
+
+func glGetProgramInterfaceiv
+    
+
+func glGetProgramResourceIndex
+    
+
+func glGetProgramResourceName
+    
+
+func glGetProgramResourceiv
+    
+
+func glGetProgramResourceLocation
+    
+
 func glCreateShaderProgramv
     custom
+
+func glDeleteProgramPipelines
+    
+
+func glGenProgramPipelines
+    
+
+func glGetProgramPipelineiv
+    
+
+func glProgramUniform1iv
+    
+
+func glProgramUniform2iv
+    
+
+func glProgramUniform3iv
+    
+
+func glProgramUniform4iv
+    
+
+func glProgramUniform1uiv
+    
+
+func glProgramUniform2uiv
+    
+
+func glProgramUniform3uiv
+    
+
+func glProgramUniform4uiv
+    
+
+func glProgramUniform1fv
+    
+
+func glProgramUniform2fv
+    
+
+func glProgramUniform3fv
+    
+
+func glProgramUniform4fv
+    
+
+func glProgramUniformMatrix2fv
+    
+
+func glProgramUniformMatrix3fv
+    
+
+func glProgramUniformMatrix4fv
+    
+
+func glProgramUniformMatrix2x3fv
+    
+
+func glProgramUniformMatrix3x2fv
+    
+
+func glProgramUniformMatrix2x4fv
+    
+
+func glProgramUniformMatrix4x2fv
+    
+
+func glProgramUniformMatrix3x4fv
+    
+
+func glProgramUniformMatrix4x3fv
+    
+
+func glGetProgramPipelineInfoLog
+    
+
+func glGetBooleani_v
+    
+
+func glGetMultisamplefv
+    
+
+func glGetTexLevelParameteriv
+    
+
+func glGetTexLevelParameterfv
+    
+
+func glDebugMessageControl
+    
+
+func glDebugMessageInsert
+    
+
+func glDebugMessageCallback
+    
+
+func glGetDebugMessageLog
+    
+
+func glPushDebugGroup
+    
+
+func glObjectLabel
+    
+
+func glGetObjectLabel
+    
+
+func glObjectPtrLabel
+    
+
+func glGetObjectPtrLabel
+    
+
+func glGetPointerv
+    
+
+func glDrawElementsBaseVertex
+    
+
+func glDrawRangeElementsBaseVertex
+    
+
+func glDrawElementsInstancedBaseVertex
+    
+
+func glReadnPixels
+    
+
+func glGetnUniformfv
+    
+
+func glGetnUniformiv
+    
+
+func glGetnUniformuiv
+    
+
+func glTexParameterIiv
+    
+
+func glTexParameterIuiv
+    
+
+func glGetTexParameterIiv
+    
+
+func glGetTexParameterIuiv
+    
+
+func glSamplerParameterIiv
+    
+
+func glSamplerParameterIuiv
+    
+
+func glGetSamplerParameterIiv
+    
+
+func glGetSamplerParameterIuiv
+    
+
