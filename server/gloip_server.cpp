@@ -33,7 +33,9 @@ BlobArgument::BlobArgument(uint32_t size, const uint8_t* data)
 }
 
 BlobArgument::~BlobArgument() {
-    delete [] data;
+    if(data != nullptr) {
+        delete [] data;
+    }
 }
 
 ArgumentType BlobArgument::getType() {
@@ -48,15 +50,16 @@ ArgumentType BlobReturnArgument::getType() {
     return TYPE_POINTER_RETURN;
 }
 
-BlobReturnArgument::BlobReturnArgument(uint32_t size, uint8_t* destination)
-    : size(size),
-      destination(destination)
+BlobReturnArgument::BlobReturnArgument(uint32_t size)
+    : size(size)
     {
-
+    this->destination = size > 0 ? new uint8_t[size] : nullptr;
 }
 
 BlobReturnArgument::~BlobReturnArgument() {
-    delete [] destination;
+    if(destination != nullptr) {
+        delete [] destination;
+    }
 }
 
 uint32_t BlobReturnArgument::getSize() {
@@ -65,11 +68,17 @@ uint32_t BlobReturnArgument::getSize() {
 
 CustomArgument::CustomArgument(uint32_t size)
     : size(size) {
-    data = new uint8_t[size];
+    if(size != 0) {
+        data = new uint8_t[size];
+    } else {
+        data = nullptr;
+    }
 }
 
 CustomArgument::~CustomArgument() {
-    delete [] data;
+    if(data != nullptr) {
+        delete [] data;
+    }
 }
 
 ArgumentType CustomArgument::getType() {
@@ -81,7 +90,9 @@ uint32_t CustomArgument::getSize() {
 }
 
 void CustomArgument::reallocate(uint32_t newSize) {
-    delete [] data;
+    if(data != nullptr) {
+        delete [] data;
+    }
     size = newSize;
     data = new uint8_t[size];
 }
@@ -340,14 +351,16 @@ BlobArgument* gloip_createBlobArgument(uint32_t size, const uint8_t* buffer) {
 BlobReturnArgument* gloip_createBlobReturnArgument(uint32_t size, const uint8_t* buffer) {
     uint32_t dataSize;
     memcpy(&dataSize, buffer + 1, sizeof(uint32_t));
-    uint8_t* blobData = new uint8_t[dataSize];
-    return new BlobReturnArgument(dataSize, blobData);
+
+    return new BlobReturnArgument(dataSize);
 }
 
 CustomArgument* gloip_createCustomArgument(uint32_t size, const uint8_t* buffer) {
     uint32_t dataSize;
     memcpy(&dataSize, buffer + 1, sizeof(uint32_t));
     CustomArgument* arg = new CustomArgument(dataSize);
-    memcpy(arg->data, buffer + 5, dataSize);
+    if(dataSize > 0) {
+        memcpy(arg->data, buffer + 5, dataSize);
+    }
     return arg;
 }

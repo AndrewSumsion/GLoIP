@@ -59,7 +59,7 @@ struct BlobReturnArgument : public Argument {
     uint32_t size;
     uint8_t* destination;
 
-    BlobReturnArgument(uint32_t size, uint8_t* destination);
+    BlobReturnArgument(uint32_t size);
     ~BlobReturnArgument();
 
     ArgumentType getType();

@@ -319,7 +319,9 @@ bool gloip_waitForResponse(IOHandler* io, size_t returnSize, void* returnLocatio
                 if(providedSize > customArg->size) {
                     customArg->reallocate(providedSize);
                 }
-                memcpy(customArg->data, argBuffer + 4, providedSize);
+                if(providedSize > 0) {
+                    memcpy(customArg->data, argBuffer + 4, providedSize);
+                }
             }
         }
 
