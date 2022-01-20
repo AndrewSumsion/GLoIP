@@ -67,8 +67,12 @@ def writeFunction(file, name, function, meta):
     file.write("\n")
 
     argumentsLine = "    Argument* args[] = {"
-    for i in range(len(args)):
-        argumentsLine += "&arg" + str(i + 1) + ", "
+
+    if len(args) > 0:
+        for i in range(len(args) - 1):
+            argumentsLine += "&arg" + str(i + 1) + ", "
+        argumentsLine += "&arg" + str(len(args))
+
     argumentsLine += "};\n\n"
 
     file.write(argumentsLine)

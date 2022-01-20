@@ -55,6 +55,7 @@ protocols
     └───test.h.meta
 ```
 To understand the metadata format, see the documentation in `protocols/test/test.h.meta`
+You can generate a template metadata file for your protocol with the `create_meta_template.py` script.
 
 If the metadata declares that a function needs a custom implementation, it MUST be implemented in both of the `*_custom.cpp` files.
 The implementations should be declared like so:
@@ -91,6 +92,5 @@ Building the server is similar. Run `python3 build_server.py <protocol>`. The re
 ## To-Do
 - Finish metadata for all of OpenGL ES 3.2
 - Create some kind of solution for functions like eglGetProcAddress
-- Implement buffered IO
-- Change protocol to be more alignment friendly
-- Change protocol to require fewer read calls
+- Include multiple protocols in one library
+- Implement a page-based, aligned protocol for communicating
