@@ -376,6 +376,12 @@ func glGetActiveUniformBlockName
 func glDrawElementsInstanced
     
 
+func glClientWaitSync
+    blocking
+
+func glWaitSync
+    blocking
+
 func glGetInteger64v
     
 
