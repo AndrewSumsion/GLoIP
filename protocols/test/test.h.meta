@@ -44,3 +44,6 @@ func getHash
 
 func getProperty
     custom
+
+func waitOneSecond
+    blocking

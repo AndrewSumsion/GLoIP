@@ -17,5 +17,6 @@ GL_APICALL double GL_APIENTRY squareRoot(double d);
 GL_APICALL int GL_APIENTRY getHash(int count, const char* buffer);
 GL_APICALL int GL_APIENTRY getBalance(int uid);
 GL_APICALL const char* GL_APIENTRY getProperty(int propID);
+GL_APICALL void GL_APIENTRY waitOneSecond();
 
 #endif // GLOIP_TEST_H
