@@ -65,6 +65,7 @@ bool IOHandler::isConnected() const {
 
 IOHandler::IOHandler()
     : connected(false) {
+    threadHandle = pthread_self();
     pthread_mutex_init(&readMutex, nullptr);
     pthread_mutex_init(&writeMutex, nullptr);
 }

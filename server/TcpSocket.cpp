@@ -42,6 +42,10 @@ bool TcpSocket::read(int size, uint8_t* buffer, int* bytesRead) {
         error = errno;
         return false;
     }
+    if(result == 0) {
+        closed = true;
+        return false;
+    }
     *bytesRead = result;
     return true;
 }

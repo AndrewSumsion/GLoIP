@@ -8,6 +8,7 @@ using std::vector;
 #include <typeinfo>
 
 #include <cstdio>
+#include <cstdlib>
 
 #define LOG(...) printf(__VA_ARGS__)
 
@@ -119,7 +120,6 @@ void CustomArgument::reallocate(uint32_t newSize) {
 }
 
 void gloip_cleanupHandler(void* arg) {
-    LOG("cleaning up connection on thread exit\n");
     bool success;
 
     IOHandler* io = (IOHandler*) arg;
@@ -151,6 +151,10 @@ static char* gloipHostname;
 static int gloipPort;
 static pthread_key_t connectionKey;
 
+void gloip_mainThreadExit() {
+    gloip_cleanupHandler(pthread_getspecific(connectionKey));
+}
+
 void gloip_initialize(const char* hostname, int port) {
     size_t size = strlen(hostname) + 1;
     gloipHostname = new char[size];
@@ -158,6 +162,7 @@ void gloip_initialize(const char* hostname, int port) {
     gloipPort = port;
 
     pthread_key_create(&connectionKey, gloip_cleanupHandler);
+    atexit(gloip_mainThreadExit);
 }
 
 void gloip_shutdown() {
@@ -167,10 +172,12 @@ void gloip_shutdown() {
 
 IOHandler* gloip_getConnection() {
     IOHandler* connection = (IOHandler*) pthread_getspecific(connectionKey);
+    // first time gloip is used on this thread
     if(connection == nullptr) {
         connection = gloip_createConnection();
         pthread_setspecific(connectionKey, connection);
     }
+    // reconnecting
     if(connection != nullptr && !connection->isConnected()) {
         delete connection;
         connection = gloip_createConnection();

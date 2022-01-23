@@ -69,16 +69,23 @@ int TcpIOHandler::getError() {
 
 bool TcpIOHandler::read(int size, uint8_t *buffer, int* bytesRead) {
     if(!connected) {
+        error = ENOTCONN;
         return false;
     }
     ssize_t result = readImpl(fd, buffer, size);
     CHECK_RETURN(result)
+    if(result == 0) {
+        // other end disconnected
+        error = ENOTCONN;
+        return false;
+    }
     *bytesRead = result;
     return true;
 }
 
 bool TcpIOHandler::write(int size, const uint8_t *buffer, int* bytesWritten) {
     if(!connected) {
+        error = ENOTCONN;
         return false;
     }
     ssize_t result = writeImpl(fd, buffer, size);

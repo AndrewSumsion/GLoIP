@@ -18,6 +18,9 @@ private:
 protected:
     bool connected;
 public:
+    // the thread this handler belongs to
+    pthread_t threadHandle;
+
     virtual bool write(int size, const uint8_t* buffer, int* bytesWritten) = 0;
     virtual bool read(int size, uint8_t* buffer, int* bytesRead) = 0;
     virtual bool connect() = 0;
