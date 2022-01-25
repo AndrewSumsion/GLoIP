@@ -8,4 +8,4 @@ add_library(gloipclient SHARED gloip_client_generated.cpp
                                TcpIOHandler.cpp
 )
 
-target_include_directories(gloipclient PUBLIC ../protocols/${GLOIP_PROTOCOL})
+target_include_directories(gloipclient PUBLIC ../protocols/${GLOIP_PROTOCOL} ../include)

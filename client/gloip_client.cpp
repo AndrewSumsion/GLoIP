@@ -221,6 +221,18 @@ IOHandler* gloip_createConnection() {
     return handler;
 }
 
+static uint32_t glError = 0;
+
+uint32_t gloip_getGlError() {
+    uint32_t error = glError;
+    glError = 0;
+    return error;
+}
+
+void gloip_setGlError(uint32_t error) {
+    glError = error;
+}
+
 void gloip_execute(uint32_t functionHash, bool waitForReturn, size_t returnSize, void* returnLocation, int numArgs, Argument** args) {
     IOHandler* io = gloip_getConnection();
 

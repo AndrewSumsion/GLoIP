@@ -65,6 +65,22 @@ def parseMetaFile(file):
         if args[0] == "blocking":
             meta["functions"][currentFunction]["blocking"] = True
             continue
+        
+        if args[0] == "check_param":
+            if not "param_checks" in meta["functions"][currentFunction]:
+                meta["functions"][currentFunction]["param_checks"] = []
+            
+            startIndex = metaLine.index("check_param") + len("check_param ") + len(args[1]) + 1
+
+            paramCheck = {
+                "error": args[1],
+                "condition": metaLine[startIndex:].strip()
+            }
+            meta["functions"][currentFunction]["param_checks"].append(paramCheck)
+        
+        if args[0] == "unsupported":
+            meta["functions"][currentFunction]["unsupported"] = True
+            continue
     
     return meta
 
@@ -123,4 +139,6 @@ def writeHeader(file, meta, headerName):
     file.write("\n")
     file.write("#include <cstring>\n")
     file.write("using std::memcpy;\n")
+    file.write("\n")
+    file.write("#include <cstdio>\n")
     file.write("\n")

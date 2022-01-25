@@ -59,7 +59,8 @@ func glDeleteTextures
     bsize textures n * sizeof(GLuint)
 
 func glDrawElements
-    custom
+//    custom
+    unsupported
     // indices might be a blob or an offset to a buffer in gpu memory
 
 func glFinish
@@ -137,7 +138,8 @@ func glGetShaderSource
     rsize source bufSize
 
 func glGetString
-    custom
+//    custom
+    unsupported
     // returns a variable-length null-terminated string
     // needs to be permanently allocated in the heap somehow
     // should probably use a heap allocated vector to store all of these
@@ -149,11 +151,13 @@ func glGetTexParameteriv
     rsize params (target == GL_TEXTURE_BORDER_COLOR ? 4 : 1) * sizeof(GLint)
 
 func glGetUniformfv
-    custom
+//    custom
+    unsupported
     // TODO: I have no idea how the heck I'm going to do this
 
 func glGetUniformiv
-    custom
+//    custom
+    unsupported
     // TODO: I have no idea how the heck I'm going to do this
 
 func glGetUniformLocation
@@ -166,11 +170,13 @@ func glGetVertexAttribiv
     rsize params (pname == GL_CURRENT_VERTEX_ATTRIB ? 4 : 1) * sizeof(GLint)
 
 func glGetVertexAttribPointerv
-    custom
+//    custom
+    unsupported
     // no idea, check documentation
 
 func glReadPixels
-    custom
+//    custom
+    unsupported
     // https://www.khronos.org/registry/OpenGL-Refpages/es3.0/html/glReadPixels.xhtml
     // pixels might be a return pointer or an offset casted to a pointer
 
@@ -179,12 +185,15 @@ func glShaderBinary
     bsize binary length
 
 func glShaderSource
-    custom
+//    custom
+    unsupported
     // sends an array of null-terminated strings
 
 func glTexImage2D
-    custom
-    // pixels might be a return pointer or an offset casted to a pointer
+//    custom
+    unsupported
+    // pixels might be a blob pointer or an offset casted to a pointer
+    // if glGetIntegerv(GL_PIXEL_UNPACK_BUFFER_BINDING) is 0, it's a blob
 
 func glTexParameterfv
     bsize params (target == GL_TEXTURE_BORDER_COLOR ? 4 : 1) * sizeof(GLfloat)
@@ -193,7 +202,8 @@ func glTexParameteriv
     bsize params (target == GL_TEXTURE_BORDER_COLOR ? 4 : 1) * sizeof(GLint)
 
 func glTexSubImage2D
-    custom
+//    custom
+    unsupported
     // pixels might be a return pointer or an offset casted to a pointer
 
 func glUniform1fv
@@ -221,160 +231,172 @@ func glUniform4iv
     bsize value 4 * count * sizeof(GLint)
 
 func glUniformMatrix2fv
-    
+    bsize value 2 * 2 * count
 
 func glUniformMatrix3fv
-    
+    bsize value 3 * 3 * count
 
 func glUniformMatrix4fv
-    
+    bsize value 4 * 4 * count
 
 func glVertexAttrib1fv
-    
+    bsize v sizeof(GLfloat)
 
 func glVertexAttrib2fv
-    
+    bsize v 2 * sizeof(GLfloat)
 
 func glVertexAttrib3fv
-    
+    bsize v 3 * sizeof(GLfloat)
 
 func glVertexAttrib4fv
-    
+    bsize v 4 * sizeof(GLfloat)
 
+// pointer is always a byte offset, never an actual pointer
+// 4 is a safe bet, I don't think we'll need to worry about 4gb+ vbos
 func glVertexAttribPointer
-    
+    bsize pointer 4
 
+// indices is a byte offset if there is a buffer bound to GL_ELEMENT_ARRAY_BUFFER
+// if glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, ...) returns 0, it's a pointer
 func glDrawRangeElements
-    
+//    custom
+    unsupported
 
+// see comment on glTexImage2D
 func glTexImage3D
-    
+//    custom
+    unsupported
 
 func glTexSubImage3D
-    
+//    custom
+    unsupported
 
 func glCompressedTexImage3D
-    
+    bsize data imageSize
 
 func glCompressedTexSubImage3D
-    
+    bsize data imageSize
 
 func glGenQueries
-    
+    rsize ids n * sizeof(GLuint)
 
 func glDeleteQueries
-    
+    bsize ids n * sizeof(GLuint)
 
 func glGetQueryiv
-    
+    rsize params sizeof(GLint)
 
 func glGetQueryObjectuiv
-    
+    rsize params sizeof(GLuint)
 
+// not sure this one is even possible with gloip
 func glGetBufferPointerv
-    
+//    custom
+    unsupported
 
 func glDrawBuffers
-    
+    unsupported
 
 func glUniformMatrix2x3fv
-    
+    unsupported
 
 func glUniformMatrix3x2fv
-    
+    unsupported
 
 func glUniformMatrix2x4fv
-    
+    unsupported
 
 func glUniformMatrix4x2fv
-    
+    unsupported
 
 func glUniformMatrix3x4fv
-    
+    unsupported
 
 func glUniformMatrix4x3fv
-    
+    unsupported
 
 func glMapBufferRange
-    
+    unsupported
 
 func glDeleteVertexArrays
-    
+    unsupported
 
 func glGenVertexArrays
-    
+    unsupported
 
 func glGetIntegeri_v
-    
+    unsupported
 
 func glTransformFeedbackVaryings
-    custom
+//    custom
+    unsupported
 
 func glGetTransformFeedbackVarying
-    
+    unsupported
 
 func glVertexAttribIPointer
-    
+    unsupported
 
 func glGetVertexAttribIiv
-    
+    unsupported
 
 func glGetVertexAttribIuiv
-    
+    unsupported
 
 func glVertexAttribI4iv
-    
+    unsupported
 
 func glVertexAttribI4uiv
-    
+    unsupported
 
 func glGetUniformuiv
-    
+    unsupported
 
 func glGetFragDataLocation
-    
+    unsupported
 
 func glUniform1uiv
-    
+    unsupported
 
 func glUniform2uiv
-    
+    unsupported
 
 func glUniform3uiv
-    
+    unsupported
 
 func glUniform4uiv
-    
+    unsupported
 
 func glClearBufferiv
-    
+    unsupported
 
 func glClearBufferuiv
-    
+    unsupported
 
 func glClearBufferfv
-    
+    unsupported
 
 func glGetStringi
-    
+    unsupported
 
 func glGetUniformIndices
-    custom
+//    custom
+    unsupported
 
 func glGetActiveUniformsiv
-    
+    unsupported
 
 func glGetUniformBlockIndex
-    
+    unsupported
 
 func glGetActiveUniformBlockiv
-    
+    unsupported
 
 func glGetActiveUniformBlockName
-    
+    unsupported
 
 func glDrawElementsInstanced
-    
+    unsupported
 
 func glClientWaitSync
     blocking
@@ -383,242 +405,243 @@ func glWaitSync
     blocking
 
 func glGetInteger64v
-    
+    unsupported
 
 func glGetSynciv
-    
+    unsupported
 
 func glGetInteger64i_v
-    
+    unsupported
 
 func glGetBufferParameteri64v
-    
+    unsupported
 
 func glGenSamplers
-    
+    unsupported
 
 func glDeleteSamplers
-    
+    unsupported
 
 func glSamplerParameteriv
-    
+    unsupported
 
 func glSamplerParameterfv
-    
+    unsupported
 
 func glGetSamplerParameteriv
-    
+    unsupported
 
 func glGetSamplerParameterfv
-    
+    unsupported
 
 func glDeleteTransformFeedbacks
-    
+    unsupported
 
 func glGenTransformFeedbacks
-    
+    unsupported
 
 func glGetProgramBinary
-    
+    unsupported
 
 func glProgramBinary
-    
+    unsupported
 
 func glInvalidateFramebuffer
-    
+    unsupported
 
 func glInvalidateSubFramebuffer
-    
+    unsupported
 
 func glGetInternalformativ
-    
+    unsupported
 
 func glDrawArraysIndirect
-    
+    unsupported
 
 func glDrawElementsIndirect
-    
+    unsupported
 
 func glGetFramebufferParameteriv
-    
+    unsupported
 
 func glGetProgramInterfaceiv
-    
+    unsupported
 
 func glGetProgramResourceIndex
-    
+    unsupported
 
 func glGetProgramResourceName
-    
+    unsupported
 
 func glGetProgramResourceiv
-    
+    unsupported
 
 func glGetProgramResourceLocation
-    
+    unsupported
 
 func glCreateShaderProgramv
-    custom
+//    custom
+    unsupported
 
 func glDeleteProgramPipelines
-    
+    unsupported
 
 func glGenProgramPipelines
-    
+    unsupported
 
 func glGetProgramPipelineiv
-    
+    unsupported
 
 func glProgramUniform1iv
-    
+    unsupported
 
 func glProgramUniform2iv
-    
+    unsupported
 
 func glProgramUniform3iv
-    
+    unsupported
 
 func glProgramUniform4iv
-    
+    unsupported
 
 func glProgramUniform1uiv
-    
+    unsupported
 
 func glProgramUniform2uiv
-    
+    unsupported
 
 func glProgramUniform3uiv
-    
+    unsupported
 
 func glProgramUniform4uiv
-    
+    unsupported
 
 func glProgramUniform1fv
-    
+    unsupported
 
 func glProgramUniform2fv
-    
+    unsupported
 
 func glProgramUniform3fv
-    
+    unsupported
 
 func glProgramUniform4fv
-    
+    unsupported
 
 func glProgramUniformMatrix2fv
-    
+    unsupported
 
 func glProgramUniformMatrix3fv
-    
+    unsupported
 
 func glProgramUniformMatrix4fv
-    
+    unsupported
 
 func glProgramUniformMatrix2x3fv
-    
+    unsupported
 
 func glProgramUniformMatrix3x2fv
-    
+    unsupported
 
 func glProgramUniformMatrix2x4fv
-    
+    unsupported
 
 func glProgramUniformMatrix4x2fv
-    
+    unsupported
 
 func glProgramUniformMatrix3x4fv
-    
+    unsupported
 
 func glProgramUniformMatrix4x3fv
-    
+    unsupported
 
 func glGetProgramPipelineInfoLog
-    
+    unsupported
 
 func glGetBooleani_v
-    
+    unsupported
 
 func glGetMultisamplefv
-    
+    unsupported
 
 func glGetTexLevelParameteriv
-    
+    unsupported
 
 func glGetTexLevelParameterfv
-    
+    unsupported
 
 func glDebugMessageControl
-    
+    unsupported
 
 func glDebugMessageInsert
-    
+    unsupported
 
 func glDebugMessageCallback
-    
+    unsupported
 
 func glGetDebugMessageLog
-    
+    unsupported
 
 func glPushDebugGroup
-    
+    unsupported
 
 func glObjectLabel
-    
+    unsupported
 
 func glGetObjectLabel
-    
+    unsupported
 
 func glObjectPtrLabel
-    
+    unsupported
 
 func glGetObjectPtrLabel
-    
+    unsupported
 
 func glGetPointerv
-    
+    unsupported
 
 func glDrawElementsBaseVertex
-    
+    unsupported
 
 func glDrawRangeElementsBaseVertex
-    
+    unsupported
 
 func glDrawElementsInstancedBaseVertex
-    
+    unsupported
 
 func glReadnPixels
-    
+    unsupported
 
 func glGetnUniformfv
-    
+    unsupported
 
 func glGetnUniformiv
-    
+    unsupported
 
 func glGetnUniformuiv
-    
+    unsupported
 
 func glTexParameterIiv
-    
+    unsupported
 
 func glTexParameterIuiv
-    
+    unsupported
 
 func glGetTexParameterIiv
-    
+    unsupported
 
 func glGetTexParameterIuiv
-    
+    unsupported
 
 func glSamplerParameterIiv
-    
+    unsupported
 
 func glSamplerParameterIuiv
-    
+    unsupported
 
 func glGetSamplerParameterIiv
-    
+    unsupported
 
 func glGetSamplerParameterIuiv
-    
+    unsupported
 

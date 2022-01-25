@@ -8,7 +8,7 @@ add_library(gloipserver SHARED gloip_server_generated.cpp
                                TcpSocket.cpp
 )
 
-target_include_directories(gloipserver PUBLIC ../protocols/${GLOIP_PROTOCOL})
+target_include_directories(gloipserver PUBLIC ../protocols/${GLOIP_PROTOCOL} ../include)
 
 find_library(GLOIP_PROTOCOL_LIBRARY ${GLOIP_PROTOCOL} PATHS ../protocols/${GLOIP_PROTOCOL})
 find_package(Threads REQUIRED)

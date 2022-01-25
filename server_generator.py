@@ -17,6 +17,13 @@ def writeFunction(file, name, function, meta):
     declarationString = "void gloipRedirect_" + name + "(bool* returnedSomething, uint8_t* returnSize, void* returnLocation, uint8_t numArgs, Argument** args) {\n"
     file.write(declarationString)
 
+    if metaArgs != None and "unsupported" in metaArgs and metaArgs["unsupported"]:
+        file.write("    printf(\"Function %s was called but is unsupported!\\n\", \"" + name + "\");\n")
+        file.write("    return;\n")
+        file.write("}\n\n")
+        return
+
+
     if retType != "void":
         file.write("    *returnedSomething = true;\n")
         file.write("    *returnSize = sizeof(" + retType + ");\n")

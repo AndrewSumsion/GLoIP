@@ -20,6 +20,15 @@ def writeFunction(file, name, function, meta):
 
     file.write("    uint32_t functionHash = " + hashExpression + ";\n\n")
 
+    if metaArgs != None and "unsupported" in metaArgs and metaArgs["unsupported"]:
+        file.write("    printf(\"Function %s was called but is unsupported!\\n\", \"" + name + "\");\n")
+        if retType == "void":
+            file.write("    return;\n")
+        else:
+            file.write("    return (" + retType + ")0;")
+        file.write("}\n\n")
+        return
+
     returnPrimitive = retType != "void"
     waitForReturn = returnPrimitive
 

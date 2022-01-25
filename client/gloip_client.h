@@ -83,6 +83,9 @@ GLOIP_EXPORT void gloip_shutdown();
 IOHandler* gloip_getConnection();
 IOHandler* gloip_createConnection();
 
+uint32_t gloip_getGlError();
+void gloip_setGlError(uint32_t error);
+
 void gloip_execute(uint32_t functionHash, bool waitForReturn, size_t returnSize, void* returnLocation, int numArgs, Argument** args);
 bool gloip_sendRequest(IOHandler* io, uint32_t functionHash, bool sendResponse, int numArgs, Argument** args);
 bool gloip_writeArgument(IOHandler* io, Argument* arg);

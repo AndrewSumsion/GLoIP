@@ -2,6 +2,7 @@
 
 #include "gloip_server.h"
 
+/*
 void gloipRedirect_glDrawElements(bool* returnedSomething, uint8_t* returnSize, void* returnLocation, uint8_t numArgs, Argument** args) {
 
 }
@@ -50,3 +51,4 @@ void gloipRedirect_glCreateShaderProgramv(bool* returnedSomething, uint8_t* retu
 
 }
 
+*/

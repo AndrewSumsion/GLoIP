@@ -10,7 +10,8 @@ using std::thread;
 PrimitiveArgument::PrimitiveArgument(uint8_t typeSize, const void* primitive)
     : typeSize(typeSize)
     {
-    memcpy(this->data, primitive, typeSize);
+    memset(data, 0, 8);
+    memcpy(data, primitive, typeSize);
 }
 
 ArgumentType PrimitiveArgument::getType() {
